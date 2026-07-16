@@ -5,8 +5,10 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import NamedTuple
 
-import pathspec
-from pathspec import PathSpec
+from pathspec import (
+    GitIgnoreSpec,
+    PathSpec,
+)
 from sensai.util.logging import LogTime
 
 log = logging.getLogger(__name__)
@@ -110,12 +112,16 @@ class GitignoreSpec:
     """List of patterns from the gitignore file.
     The patterns are adjusted based on the gitignore file location.
     """
-    pathspec: PathSpec = field(init=False)
+    pathspec: GitIgnoreSpec = field(
+        init=False,
+    )
     """Compiled PathSpec object for pattern matching."""
 
     def __post_init__(self) -> None:
         """Initialize the PathSpec from patterns."""
-        self.pathspec = PathSpec.from_lines(pathspec.patterns.GitWildMatchPattern, self.patterns)
+        self.pathspec = GitIgnoreSpec.from_lines(
+            self.patterns,
+        )
 
     def matches(self, relative_path: str) -> bool:
         """
@@ -164,18 +170,25 @@ class GitignoreParser:
         queue: list[str] = [self.repo_root]
 
         def scan(abs_path: str | None) -> Iterator[str]:
-            for entry in os.scandir(abs_path):
-                try:
-                    if entry.is_dir(follow_symlinks=follow_symlinks):
-                        queue.append(entry.path)
-                    elif entry.is_file(follow_symlinks=follow_symlinks) and entry.name == ".gitignore":
-                        yield entry.path
-                except PermissionError as ex:
-                    log.debug(f"Skipping entry due to permission error: {entry.path}", exc_info=ex)
-                    continue
-                except FileNotFoundError as ex:
-                    log.debug(f"Skipping entry due to file not found error (possibly a broken link): {entry.path}", exc_info=ex)
-                    continue
+            with os.scandir(abs_path) as entries:
+                for entry in entries:
+                    try:
+                        if entry.is_dir(follow_symlinks=follow_symlinks):
+                            queue.append(entry.path)
+                        elif entry.is_file(follow_symlinks=follow_symlinks) and entry.name == ".gitignore":
+                            yield entry.path
+                    except PermissionError as ex:
+                        log.debug(
+                            f"Skipping entry due to permission error: {entry.path}",
+                            exc_info=ex,
+                        )
+                        continue
+                    except FileNotFoundError as ex:
+                        log.debug(
+                            f"Skipping entry due to file not found error (possibly a broken link): {entry.path}",
+                            exc_info=ex,
+                        )
+                        continue
 
         while queue:
             next_abs_path = queue.pop(0)

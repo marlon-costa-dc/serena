@@ -615,7 +615,7 @@ class SolidLanguageServer(ABC):
         log.debug(f"Processing {len(processed_patterns)} ignored paths from the config")
 
         # Create a pathspec matcher from the processed patterns
-        self._ignore_spec = pathspec.PathSpec.from_lines(pathspec.patterns.GitWildMatchPattern, processed_patterns)
+        self._ignore_spec = pathspec.GitIgnoreSpec.from_lines(processed_patterns)
 
         self._has_waited_for_cross_file_references = False
 

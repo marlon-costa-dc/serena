@@ -4,7 +4,7 @@ import tempfile
 from pathlib import Path
 
 # Assuming the gitignore parser code is in a module named 'gitignore_parser'
-from pathspec import PathSpec
+from pathspec import GitIgnoreSpec
 
 from serena.util.file_system import GitignoreParser, GitignoreSpec, match_path
 
@@ -195,7 +195,7 @@ test.log
 
     def test_match_path_root_directory(self):
         """Root directory should never be ignored by pathspec patterns."""
-        spec = PathSpec.from_lines("gitwildmatch", ["/.*/"])
+        spec = GitIgnoreSpec.from_lines(["/.*/"])
 
         assert not match_path(".", spec, root_path=str(self.repo_path))
         assert not match_path("", spec, root_path=str(self.repo_path))

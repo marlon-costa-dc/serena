@@ -29,7 +29,7 @@ dependencies = [
   "ruamel.yaml>=0.18.14",
   "jinja2==3.1.6",
   "dotenv==0.9.9",
-  "pathspec==0.12.1",
+  "pathspec==1.1.1",
   "psutil==7.0.0",
   "docstring_parser==0.17.0",
   "joblib==1.5.1",
@@ -175,7 +175,7 @@ exclude = ["src/solidlsp/language_servers/**/static", "src/multilspy", "test/res
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
-line-ending = "auto"
+line-ending = "lf"
 skip-magic-trailing-comma = false
 docstring-code-format = true
 
