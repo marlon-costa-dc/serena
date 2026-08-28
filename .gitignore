@@ -276,3 +276,5 @@ zz-misc/
 vue-implementation/
 
 news/news.json
+# --- ai-hub workspace local environment cache ---
+.direnv/
